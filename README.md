@@ -27,3 +27,4 @@ Working in a command line environment is recommended for ease of use with git an
 *  Create a RESTful API using FastAPI this must implement:
     * GET on the root giving a welcome message.
     * POST that does model inference.
+Sat Sep 27 15:48:57 CDT 2025 – enable CI
