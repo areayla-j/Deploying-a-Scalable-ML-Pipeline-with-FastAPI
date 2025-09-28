@@ -1,87 +1,84 @@
-import os
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from ml.data import process_data
 from ml.model import (
-    compute_model_metrics,
-    inference,
-    load_model,
-    performance_on_categorical_slice,
-    save_model,
     train_model,
+    inference,
+    compute_model_metrics,
+    save_model,   # provided by the starter
 )
-# TODO: load the cencus.csv data
-project_path = "Your path here"
-data_path = os.path.join(project_path, "data", "census.csv")
-print(data_path)
-data = None # your code here
 
-# TODO: split the provided data to have a train dataset and a test dataset
-# Optional enhancement, use K-fold cross validation instead of a train-test split.
-train, test = None, None# Your code here
+def main():
+    # 1) Load data
+    data = pd.read_csv("data/census.csv")
 
-# DO NOT MODIFY
-cat_features = [
-    "workclass",
-    "education",
-    "marital-status",
-    "occupation",
-    "relationship",
-    "race",
-    "sex",
-    "native-country",
-]
+    # 2) Census categorical features + target
+    cat_features = [
+        "workclass",
+        "education",
+        "marital-status",
+        "occupation",
+        "relationship",
+        "race",
+        "sex",
+        "native-country",
+    ]
+    label = "salary"  # '<=50K' / '>50K'
 
-# TODO: use the process_data function provided to process the data.
-X_train, y_train, encoder, lb = process_data(
-    # your code here
-    # use the train dataset 
-    # use training=True
-    # do not need to pass encoder and lb as input
+    # 3) Split
+    train, test = train_test_split(
+        data, test_size=0.20, random_state=42, stratify=data[label]
     )
 
-X_test, y_test, _, _ = process_data(
-    test,
-    categorical_features=cat_features,
-    label="salary",
-    training=False,
-    encoder=encoder,
-    lb=lb,
-)
+    # 4) Process (fit on train; reuse encoder/lb on test)
+    X_train, y_train, encoder, lb = process_data(
+        train,
+        categorical_features=cat_features,
+        label=label,
+        training=True,
+    )
+    X_test, y_test, _, _ = process_data(
+        test,
+        categorical_features=cat_features,
+        label=label,
+        training=False,
+        encoder=encoder,
+        lb=lb,
+    )
 
-# TODO: use the train_model function to train the model on the training dataset
-model = None # your code here
+    # 5) Train
+    model = train_model(X_train, y_train)
 
-# save the model and the encoder
-model_path = os.path.join(project_path, "model", "model.pkl")
-save_model(model, model_path)
-encoder_path = os.path.join(project_path, "model", "encoder.pkl")
-save_model(encoder, encoder_path)
+    # 6) Evaluate
+    preds = inference(model, X_test)
+    precision, recall, f1 = compute_model_metrics(y_test, preds)
+    print(f"Test Precision: {precision:.3f} | Recall: {recall:.3f} | F1:{f1:.3f}")
 
-# load the model
-model = load_model(
-    model_path
-) 
+    # 7) Save model + encoders
+    save_model(model, encoder, lb)
 
-# TODO: use the inference function to run the model inferences on the test dataset.
-preds = None # your code here
+    # 8) Slice metrics (rubric): by education -> slice_output.txt
+    slice_feature = "education"
+    with open("slice_output.txt", "w", encoding="utf-8") as f:
+        for val in sorted(test[slice_feature].dropna().unique()):
+            df_slice = test[test[slice_feature] == val]
+            if df_slice.empty:
+                continue
+            X_s, y_s, _, _ = process_data(
+                df_slice,
+                categorical_features=cat_features,
+                label=label,
+                training=False,
+                encoder=encoder,
+                lb=lb,
+            )
+            preds_s = inference(model, X_s)
+            sp, sr, sf = compute_model_metrics(y_s, preds_s)
+            f.write(
+                f"{slice_feature}={val} -> "
+                f"P:{sp:.3f} R:{sr:.3f} F1:{sf:.3f} N:{len(df_slice)}\n"
+            )
 
-# Calculate and print the metrics
-p, r, fb = compute_model_metrics(y_test, preds)
-print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}")
-
-# TODO: compute the performance on model slices using the performance_on_categorical_slice function
-# iterate through the categorical features
-for col in cat_features:
-    # iterate through the unique values in one categorical feature
-    for slicevalue in sorted(test[col].unique()):
-        count = test[test[col] == slicevalue].shape[0]
-        p, r, fb = performance_on_categorical_slice(
-            # your code here
-            # use test, col and slicevalue as part of the input
-        )
-        with open("slice_output.txt", "a") as f:
-            print(f"{col}: {slicevalue}, Count: {count:,}", file=f)
-            print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}", file=f)
+if __name__ == "__main__":
+    main()
