@@ -176,5 +176,12 @@ pyrightconfig.json
 # FastAPI setup
 fastapi/
 
+# Ignore everything in screenshots except PNGs
+screenshots/**
+!screenshots/*.png
+
+# Ignore large model artifacts
+model/model.joblib
+
 # End of https://www.toptal.com/developers/gitignore/api/python
 model/model.joblib
