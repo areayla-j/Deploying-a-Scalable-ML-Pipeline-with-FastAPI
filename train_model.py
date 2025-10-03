@@ -10,6 +10,7 @@ from ml.model import (
     performance_on_categorical_slice,
 )
 
+
 def main():
     data = pd.read_csv("data/census.csv")
 
