@@ -1,30 +1,47 @@
-Working in a command line environment is recommended for ease of use with git and dvc. If on Windows, WSL1 or 2 is recommended.
+# Deploying a Scalable ML Pipeline with FastAPI
 
-# Environment Set up (pip or conda)
-* Option 1: use the supplied file `environment.yml` to create a new environment with conda
-* Option 2: use the supplied file `requirements.txt` to create a new environment with pip
-    
-## Repositories
-* Create a directory for the project and initialize git.
-    * As you work on the code, continually commit changes. Trained models you want to use in production must be committed to GitHub.
-* Connect your local git repo to GitHub.
-* Setup GitHub Actions on your repo. You can use one of the pre-made GitHub Actions if at a minimum it runs pytest and flake8 on push and requires both to pass without error.
-    * Make sure you set up the GitHub Action to have the same version of Python as you used in development.
+**Student:** Ar’eayla Jeanpierre  
+**Course:** D501 – Machine Learning DevOps  
 
-# Data
-* Download census.csv and commit it to dvc.
-* This data is messy, try to open it in pandas and see what you get.
-* To clean it, use your favorite text editor to remove all spaces.
 
-# Model
-* Using the starter code, write a machine learning model that trains on the clean data and saves the model. Complete any function that has been started.
-* Write unit tests for at least 3 functions in the model code.
-* Write a function that outputs the performance of the model on slices of the data.
-    * Suggestion: for simplicity, the function can just output the performance on slices of just the categorical features.
-* Write a model card using the provided template.
+https://github.com/areayla-j/Deploying-a-Scalable-ML-Pipeline-with-FastAPI/actions
 
-# API Creation
-*  Create a RESTful API using FastAPI this must implement:
-    * GET on the root giving a welcome message.
-    * POST that does model inference.
-Sat Sep 27 15:48:57 CDT 2025 – enable CI
+## Deliverables
+
+- **Model + Training Script**
+  - `ml/model.py`, `train_model.py`
+
+- **Unit Tests**
+  - `test_ml.py` (3+ passing tests)
+
+- **API**
+  - `main.py` (includes GET + POST endpoints)
+  - Tested locally with `local_api.py`
+
+- **Artifacts**
+  - `model/encoder.joblib`
+  - `model/label_binarizer.joblib`
+
+- **Slice Metrics**
+  - `slice_output.txt` (performance by education feature)
+
+- **Model Card**
+  - `model_card.md` (all sections complete, personalized)
+
+- **Screenshots in `screenshots/`**
+  - `unit_test.png` – pytest passing  
+  - `local_api.png` – GET + POST working  
+  - `continuous_integration.png` – GitHub Actions passing  
+  - `slice_output.png` – slice metrics  
+  - `model_metrics.png` – precision/recall/F1 results  
+  - `final_checks.png` – flake8 + pytest clean  
+
+---
+
+## Notes
+This project demonstrates deploying a scalable machine learning pipeline with FastAPI, including:
+- Training and saving a model
+- Serving predictions via REST API
+- Automated testing and CI/CD with GitHub Actions
+- Model performance tracking and documentation
+
